@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Glossify AI</title>
+  <style>
+    :root { --bg:#f6f7fb; --card:#fff; --ink:#1d2433; --muted:#6b7280; --line:#e4e7ef;
+            --brand:#4f46e5; --ok:#15803d; --warn:#b45309; --bad:#b91c1c; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#0f1117; --card:#171a23; --ink:#e7e9f0; --muted:#9aa3b5; --line:#2a2f3d; --brand:#818cf8; }
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font:14px/1.5 system-ui, sans-serif; background:var(--bg); color:var(--ink); }
+    header { padding:16px 24px; border-bottom:1px solid var(--line); background:var(--card); }
+    header h1 { margin:0; font-size:18px; } header small { color:var(--muted); }
+    main { display:grid; grid-template-columns: 320px 1fr; gap:16px; padding:16px; max-width:1280px; margin:auto; }
+    @media (max-width: 860px) { main { grid-template-columns: 1fr; } }
+    .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; margin-bottom:16px; }
+    h2 { font-size:15px; margin:0 0 10px; }
+    label { display:block; color:var(--muted); font-size:12px; margin:8px 0 3px; }
+    input, select, textarea { width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:6px;
+                              background:transparent; color:var(--ink); font:inherit; }
+    textarea { min-height:64px; resize:vertical; }
+    button { padding:6px 12px; border-radius:6px; border:1px solid var(--line); background:var(--card);
+             color:var(--ink); cursor:pointer; font:inherit; }
+    button.primary { background:var(--brand); border-color:var(--brand); color:#fff; }
+    button:disabled { opacity:.5; cursor:default; }
+    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .list button { display:block; width:100%; text-align:left; margin-bottom:6px; }
+    .seg { border:1px solid var(--line); border-radius:8px; padding:10px; margin-bottom:10px; }
+    .seg .meta { font-size:12px; color:var(--muted); margin:4px 0; }
+    .badge { display:inline-block; padding:1px 7px; border-radius:99px; font-size:11px; border:1px solid var(--line); margin-right:4px; }
+    .st-approved { color:var(--ok); } .st-needs_review { color:var(--warn); } .st-rejected { color:var(--bad); }
+    .issue { color:var(--warn); font-size:12px; margin:2px 0; }
+    .src { white-space:pre-wrap; margin:6px 0; }
+    #status { color:var(--muted); min-height:20px; margin:6px 0; }
+    .muted { color:var(--muted); font-size:12px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Glossify AI <small>· AI-assisted translation with memory, glossary and human review</small></h1>
+</header>
+
+<main>
+  <aside>
+    <section class="card">
+      <h2>Upload a document</h2>
+      <form id="upload-form">
+        <label for="file">File (.docx, .pdf, .txt, .md)</label>
+        <input id="file" name="file" type="file" required>
+        <div class="row" style="margin-top:6px">
+          <div style="flex:1"><label for="src">From</label><input id="src" name="source_lang" value="en" required></div>
+          <div style="flex:1"><label for="tgt">To</label><input id="tgt" name="target_lang" value="fr" required></div>
+        </div>
+        <p><button class="primary" type="submit">Upload</button></p>
+      </form>
+      <div id="upload-status" class="muted"></div>
+    </section>
+
+    <section class="card">
+      <h2>Documents</h2>
+      <div id="doc-list" class="list"><span class="muted">No documents yet.</span></div>
+    </section>
+
+    <section class="card">
+      <h2>Glossary and style rules</h2>
+      <form id="glossary-form">
+        <div class="row">
+          <div style="flex:1"><label for="g-kind">Rule</label>
+            <select id="g-kind"><option value="term">Use this translation</option><option value="avoid">Avoid this wording</option></select></div>
+        </div>
+        <label for="g-src">Source term (English)</label><input id="g-src" required>
+        <label for="g-tgt">Target term</label><input id="g-tgt">
+        <label for="g-langs">Language pair (src→tgt)</label><input id="g-langs" value="en→fr" required>
+        <p><button type="submit">Add rule</button></p>
+      </form>
+      <div id="glossary-list" class="muted"></div>
+    </section>
+
+    <section class="card">
+      <h2>Translation memory search</h2>
+      <input id="tm-q" placeholder="Search past approved text">
+      <div id="tm-results" class="muted" style="margin-top:8px"></div>
+    </section>
+  </aside>
+
+  <section>
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <h2 id="doc-title" style="margin:0">Select a document</h2>
+        <div class="row">
+          <button id="btn-translate" class="primary" disabled>Translate</button>
+          <button id="btn-docx" disabled>Export .docx</button>
+          <button id="btn-txt" disabled>Export .txt</button>
+        </div>
+      </div>
+      <div id="status"></div>
+    </div>
+    <div id="segments"></div>
+  </section>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
